@@ -13,7 +13,7 @@ Here are listed some of them :
 These algorithms share common characteristics and generally follow a similar operational framework :
 ![image](https://github.com/MarcanGraffin/SDW/assets/148250755/aaa40f5f-3954-4ae2-b751-a46e6789ac2b)
 
-   I. Pre-processing
+   **I. Pre-processing**//
    Optical satellite imagery quality, when being used for land and ocean observation, is greatly impacted by cloud coverage. So, a basic first step when generating a collection of satellite images is to apply a cloud mask.
 
    II. Band combination
