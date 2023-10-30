@@ -1,4 +1,4 @@
-# SDS
+# SDW
 Codes relative to satellite-derived shoreline/waterline data extraction and analysis.
 
 # Data extraction
