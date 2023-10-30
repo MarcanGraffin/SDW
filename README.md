@@ -1,6 +1,8 @@
 # SDW
 Codes relative to satellite-derived shoreline/waterline data extraction and analysis.
 
+![image](https://github.com/MarcanGraffin/SDS/assets/148250755/80954324-8c85-4fe7-9f01-917ecf9f8988)
+
 # Data extraction
 
 For shoreline extraction we use a Python-GEE module inspired by Shoreliner algorithm (Bergsma et al., 2023).
