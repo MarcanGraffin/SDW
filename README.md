@@ -18,7 +18,8 @@ These algorithms share common characteristics and generally follow a similar ope
 
    **II. Band combination** <br />
    Key step for all satellite-based applications using optical images. Band combination involves the mathematical combination of different spectral bands in multispectral imagery (input) to create a new composite band (output). It is used for enhancing specific features or properties on an image, such as highlighting land cover, water bodies, geological features, and more.
-   For coastal applications, usual indexes used are the (Modified) Normalized Difference Water Index ((M)NDWI), the Automated Water Extraction Index (AWEI) and the Subtractive Coastal Water Index (SCowI).
+   For coastal applications, usual indexes used are the (Modified) Normalized Difference Water Index ((M)NDWI), the Automated Water Extraction Index (AWEI) and the Subtractive Coastal Water Index (SCoWI).
+   $SCoWI = B + 2(G - NIR) - 0.75 SWIR1 - 0.5 SWIR2$, with B, G, NIR, SWIR1 and SWIR2 being respectively the blue, green, near-infrared, short-wave infrared 1 and 2 bands.
 
    **III. Contouring** <br />
    Contouring involves the extraction of an interface line from the composite image generated at the previous step. Two kind of approaches can be used : a thresholding method (generally an optimized Otsu's method) followed by a Marching Square calculation, or a edge-based segmentation (e.g. Canny Filter). This step is essential to extract the waterline from the composite image, but shows similar results regardless of the contouring process followed as it mostly relies on the computation of the composite image, meaning that if the composite image dissociates clearly the 2 classes of pixel (land/sea in our case) the contouring method will roughly extract the same interface.
