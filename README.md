@@ -11,7 +11,8 @@ Here are listed some of them :
    - Shoreliner (in review for _Remote Sensing_)
 
 These algorithms share common characteristics and generally follow a similar operational framework :
-![image](https://github.com/MarcanGraffin/SDW/assets/148250755/743c96af-0a41-4ab4-8ed2-f4ac9aba5b72)
+![image](https://github.com/MarcanGraffin/SDW/assets/148250755/aaa40f5f-3954-4ae2-b751-a46e6789ac2b)
+
 
 
 # Data extraction
