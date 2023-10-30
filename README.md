@@ -30,6 +30,7 @@ These algorithms share common characteristics and generally follow a similar ope
    As outliers can greatly biased any analysis performed on the data, it is recommanded them. Note that the outlier correction used depend on the need (i.e. on the raw data).
    - The most common outlier-correction is the IQR (InterQuartile Range) correction, which defines two outlier thresholds (min and max values) based on the first and third quartile values.
    - For high numbers of systematic outliers, a modal approach can be considered.
+   
    Smoothing/interpolation can also be used regarding some specific need (generate monthly data for example).
 
 # Data extraction
