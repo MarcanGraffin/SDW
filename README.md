@@ -31,7 +31,7 @@ These algorithms share common characteristics and generally follow a similar ope
    Waterlines are usually projected over transects perpendicular to the coast in order to obtain cross-shore waterline position data over a range of spatial points.
    Once this projection is done, the data can be cleaned and formated into ss desired to make them more presentable. Outlier correction is part of this process, indeed raw data usually contain some outliers (due to unmasked clouds, bad weather, issues in the georeferencing, etc...). 
    As outliers can greatly biased any analysis performed on the data, it is recommanded them. Note that the outlier correction used depend on the need (i.e. on the raw data).
-   - The most common outlier-correction is the IQR (InterQuartile Range) correction, which defines two outlier thresholds (min and max values) based on the first and third quartile values.
+   - The most common outlier-correction is the IQR (InterQuartile Range) correction, which defines two outlier thresholds (min and max values) based on the first and third quartile values computed from the raw data.
    - For high numbers of systematic outliers, a modal approach can be considered.
    
    Smoothing/interpolation can also be used regarding some specific need (generate monthly data for example).
