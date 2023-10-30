@@ -13,18 +13,18 @@ Here are listed some of them :
 These algorithms share common characteristics and generally follow a similar operational framework :
 ![image](https://github.com/MarcanGraffin/SDW/assets/148250755/aaa40f5f-3954-4ae2-b751-a46e6789ac2b)
 
-   **I. Pre-processing** n/
+   **I. Pre-processing** <br />
    Optical satellite imagery quality, when being used for land and ocean observation, is greatly impacted by cloud coverage. So, a basic first step when generating a collection of satellite images is to apply a cloud mask.
 
-   II. Band combination
+   **II. Band combination** <br />
    Key step for all satellite-based applications using optical images. Band combination involves the mathematical combination of different spectral bands in multispectral imagery (input) to create a new composite band (output). It is used for enhancing specific features or properties on an image, such as highlighting land cover, water bodies, geological features, and more.
    For coastal applications, usual indexes used are the (Modified) Normalized Difference Water Index ((M)NDWI), the Automated Water Extraction Index (AWEI) and the Subtractive Coastal Water Index (SCowI).
 
-   III. Contouring
+   **III. Contouring** <br />
    Contouring involves the extraction of an interface line from the composite image generated at the previous step. Two kind of approaches can be used : a thresholding method (generally an optimized Otsu's method) followed by a Marching Square calculation, or a edge-based segmentation (e.g. Canny Filter). This step is essential to extract the waterline from the composite image, but shows similar results regardless of the contouring process followed as it mostly relies on the computation of the composite image, meaning that if the composite image dissociates clearly the 2 classes of pixel (land/sea in our case) the contouring method will roughly extract the same interface.
    Additionnal (optional) contouring steps can be performed to refine the extracted interface, such as the Minimal Shoreline Variability (MSV, Almar et al., 2012).
 
-   IV. Post-processing
+   **IV. Post-processing** <br />
    Waterlines are usually projected over transects perpendicular to the coast in order to obtain cross-shore waterline position data over a range of spatial points.
    Once this projection is done, the data can be cleaned and formated into ss desired to make them more presentable. Outlier correction is part of this process, indeed raw data usually contain some outliers (due to unmasked clouds, bad weather, issues in the georeferencing, etc...). 
    As outliers can greatly biased any analysis performed on the data, it is recommanded them. Note that the outlier correction used depend on the need (i.e. on the raw data).
