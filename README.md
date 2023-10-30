@@ -1,7 +1,18 @@
-# SDW
-Codes relative to satellite-derived shoreline/waterline data extraction and analysis.
+Here you will find documentation and codes relative to satellite-dervied waterlines (SDW) extraction and analysis.
 
-![image](https://github.com/MarcanGraffin/SDS/assets/148250755/80954324-8c85-4fe7-9f01-917ecf9f8988)
+# SDW
+
+Many methods enable the extraction of waterline from optical satellite imagery, usually provided by the cloud-platform Google Earth Engine (GEE). 
+Here are listed some of them :
+   - CoastSat : https://www.sciencedirect.com/science/article/pii/S1364815219300490
+   - CASSIE : https://www.sciencedirect.com/science/article/abs/pii/S1364815221000761
+   - SHOREX : https://www.sciencedirect.com/science/article/pii/S0378383918306070
+   - ShorelineMonitor (see https://www.nature.com/articles/s41598-018-24630-6)
+   - Shoreliner (in review for _Remote Sensing_)
+
+These algorithms share common characteristics and generally follow a similar operational framework :
+![image](https://github.com/MarcanGraffin/SDW/assets/148250755/743c96af-0a41-4ab4-8ed2-f4ac9aba5b72)
+
 
 # Data extraction
 
