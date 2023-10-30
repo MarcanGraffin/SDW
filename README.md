@@ -2,7 +2,7 @@ Here you will find documentation and codes relative to satellite-dervied waterli
 
 # SDW
 
-Many methods enable the extraction of waterline from optical satellite imagery, usually provided by the cloud-platform Google Earth Engine (GEE). 
+Many methods enable the extraction of waterlines from optical satellite imagery, usually provided by the cloud-platform Google Earth Engine (GEE, https://earthengine.google.com/). 
 Here are listed some of them :
    - CoastSat : https://www.sciencedirect.com/science/article/pii/S1364815219300490
    - CASSIE : https://www.sciencedirect.com/science/article/abs/pii/S1364815221000761
