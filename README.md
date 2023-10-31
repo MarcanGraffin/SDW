@@ -14,7 +14,7 @@ These algorithms share common characteristics and generally follow a similar ope
 ![image](https://github.com/MarcanGraffin/SDW/assets/148250755/aaa40f5f-3954-4ae2-b751-a46e6789ac2b)
 
    **I. Pre-processing** <br />
-   Optical satellite imagery quality, when being used for land and ocean observation, is greatly impacted by cloud coverage. So, a basic first step when generating a collection of satellite images is to apply a cloud mask.
+   Optical satellite imagery quality, when being used for land and ocean observation, is greatly impacted by cloud coverage. So, a basic first step when generating a collection of satellite images is to apply a cloud mask. Some methods also allow to artificially improve the pixel resolution of some images (e.g. pansharpening : using the 15 m-resolution panchromatic band of Landsat (7, 8 and 9) to refine the other bands).
 
    **II. Band combination** <br />
    Key step for all satellite-based applications using optical images. Band combination involves the mathematical combination of different spectral bands in multispectral imagery (input) to create a new composite band (output). It is used for enhancing specific features or properties on an image, such as highlighting land cover, water bodies, geological features, and more.
