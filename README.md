@@ -1,3 +1,6 @@
+![GIF](https://github.com/MarcanGraffin/SDW/assets/148250755/bcc854f7-0d6f-4bcb-b9f1-4ee0dd102a44)
+
+
 Here you will find documentation and codes relative to satellite-dervied waterlines (SDW) extraction and analysis.
 
 # SDW
