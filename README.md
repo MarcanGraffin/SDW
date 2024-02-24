@@ -11,7 +11,7 @@ Here are listed some of them :
    - CASSIE : https://www.sciencedirect.com/science/article/abs/pii/S1364815221000761
    - SHOREX : https://www.sciencedirect.com/science/article/pii/S0378383918306070
    - ShorelineMonitor (see https://www.nature.com/articles/s41598-018-24630-6)
-   - Shoreliner (in review for _Remote Sensing_)
+   - Shoreliner (by _Bergsma and colleagues_, in progress)
 
 These algorithms share common characteristics and generally follow a similar operational framework :
 ![image](https://github.com/MarcanGraffin/SDW/assets/148250755/aaa40f5f-3954-4ae2-b751-a46e6789ac2b)
@@ -36,9 +36,9 @@ These algorithms share common characteristics and generally follow a similar ope
 
    **IV. Post-processing** <br />
    Waterlines are usually projected over transects perpendicular to the coast in order to obtain cross-shore waterline position data over a range of spatial points.
-   Once this projection is done, the data can be cleaned and formated into ss desired to make them more presentable. Outlier correction is part of this process, indeed raw data usually contain some outliers (due to unmasked clouds, bad weather, issues in the georeferencing, etc...). 
-   As outliers can greatly biased any analysis performed on the data, it is recommanded them. Note that the outlier correction used depend on the need (i.e. on the raw data).
+   Once this projection is done, the data can be cleaned and formated into a desired format to make them more presentable. Outlier correction is part of this process, indeed raw data usually contain some outliers (due to unmasked clouds, bad weather, issues in the georeferencing, etc...). 
+   As outliers can greatly bias any analysis performed on the data, it is recommanded to remove them. Note that the outlier correction used depend on the need (i.e. on the raw data).
    - The most common outlier-correction is the IQR (InterQuartile Range) correction, which defines two outlier thresholds (min and max values) based on the first and third quartile values computed from the raw data.
    - For high numbers of systematic outliers, a modal approach can be considered.
    
-   Smoothing/interpolation can also be used regarding some specific need (generate monthly data for example).
+   Smoothing/interpolation can also be used regarding some specific need (generate monthly aggregates for example).
