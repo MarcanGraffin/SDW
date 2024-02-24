@@ -1,5 +1,6 @@
 earthengine-api
 scikit-image
 pandas
+geopandas
 shapely
 shutup
