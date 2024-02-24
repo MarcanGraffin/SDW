@@ -23,7 +23,7 @@ These algorithms share common characteristics and generally follow a similar ope
    Key step for all satellite-based applications using optical images. Band combination involves the mathematical combination of different spectral bands in multispectral imagery (input) to create a new composite band (output). It is used for enhancing specific features or properties on an image, such as highlighting land cover, water bodies, geological features, and more.
    For coastal applications, usual indexes used are the (Modified) Normalized Difference Water Index ((M)NDWI), the Automated Water Extraction Index (AWEI) and the Subtractive Coastal Water Index (SCoWI). <br />
    <br />
-   Here is shown the band combination for a Sentinel-2 multispectral image of Saint-Louis, Senegal. On the left, the RGB iamge, on the right, the SCoWI image.
+   Here is shown the band combination for a Sentinel-2 multispectral image of Saint-Louis, Senegal. On the left, the RGB image, on the right, the SCoWI image.
 
    ![image](https://github.com/MarcanGraffin/SDW/assets/148250755/712187a2-414b-4ea1-827f-12429958f413)
 
