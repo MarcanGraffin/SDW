@@ -1,0 +1,88 @@
+---
+
+##### PROJECT NAME AND LOCATION
+# project
+EE_ID : TOFILL
+PathProject : .\Projects
+Project : Torrey_Pines_test
+
+#transects path (transects in EPSG:4326)
+PathTransect :
+    - ./DataExample
+    - valid_TorreyPines.p
+
+
+##### USER-DEFINED INPUTS
+# Features to detect
+Waterline : True
+SandBar : False
+Vegetation : False
+
+# Download also RGB images (for qualitative validation)
+RGB : True
+
+#ROIs
+SizeROI : 0.1   #approximate ROIs size (in degrees 1° ~ 100km)
+SaveShpROI : True
+
+# starting and ending dates (YYYY/MM/DD)
+Dates:
+    - 2022/08/15
+    - 2022/09/01
+
+# satellite missions wanted
+Missions:
+    - S2
+    - L8
+
+# projection of the output images
+CRS : 'EPSG:3857'
+
+#Clouds
+MaxCloudCover : 10
+CloudMasks : False
+
+# WATERLINE INDEX band combination used : SCoWI, NDWI, AWEI, MNDWI, etc...
+WaterlineIndex: SCoWI
+
+# SANDBAR INDEX band combination used : SBI
+SandBarIndex : SBI
+
+# VEGETATION INDEX band combination used : NDVI
+VegetationIndex : NDVI
+
+
+
+##### METHODOLOGY
+# preprocessing : Pansharpening, CloudMasking_Landsat, CloudMasking_Sentinel2
+Preprocessing:
+    - Pansharpening
+
+# contouring method used : OtsuMS, CannyFilter
+Contouring : OtsuMS
+
+# outlier correction : IQR, modes (or None)
+OutlierCorrection :
+    - IQR : True
+    - modes : True
+
+# post processing
+Tide_prediction : False
+Tide_correction : False
+Slope_calculation : False
+
+
+
+
+
+##### OPTIONAL FOR PLOTING
+# SAVING and PLOTS
+Ploting : False #Be carefull if lauching on a large number of images
+SpecifyTransects : True
+NameTransects : ['1097']
+SaveFig : True
+SaveDate :
+    - shpLines : False
+    - shpTransects : True #Transects with cross-shore shoreline position timeseries in a json format
+    - pickle : True #Python data, in a pd.Series format
+...
