@@ -10,11 +10,11 @@ Projects : contains all your current or past waterline extraction projects, with
 ### You need a certified google earth engine account to use this tool. Check on https://earthengine.google.com/ to create an account, and for details.
 
 PREWORK : 
-1 - Create a conda environment with basic packages : _conda create -n shoreliner spyder numpy scipy pandas matplotlib sympy cython_ (shoreliner is a proposed name for the env)
+1 - Create a conda environment with basic packages : "conda create -n shoreliner spyder numpy scipy pandas matplotlib sympy cython" (shoreliner is a proposed name for the env)
 2 - Activate the environment (eg, conda activate shoreliner)
-3 - Download all the packages using first _pip install gdal_ then _pip install -r PATH/requirements.txt_
-4 - After the account has been validated, you would need to authenticate using the command _earthengine authenticate_
-  OR launch spyder (type _spyder_ in the shell) and type in the terminal type _import ee_ then _ee.Authenticate().
+3 - Download all the packages using first "pip install gdal" then "pip install -r PATH/requirements.txt"
+4 - After the account has been validated, you would need to authenticate using the command "earthengine authenticate"
+  OR launch spyder (type "spyder" in the shell) and type in the terminal type "import ee" then "ee.Authenticate()".
 
 WATERLINE EXTRACTION : 
 1 - Edit the config.yaml file in ShorelinerTool/Inputs to design the extraction process as you intend it to be (site, date range, methods, ...) and save.
