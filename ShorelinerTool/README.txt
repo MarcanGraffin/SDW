@@ -9,6 +9,7 @@ Projects : contains all your current or past waterline extraction projects, with
 
 ### You need a certified google earth engine account to use this tool. Check on https://earthengine.google.com/ to create an account, and for details.
 ### Create a Google Earth Engine Project (required) : https://console.cloud.google.com/projectcreate
+### In case python is not installed : https://docs.python-guide.org/starting/install3/linux/
 
 PREWORK : 
 1 - Create a conda environment with basic packages : "conda create -n shoreliner spyder numpy scipy pandas matplotlib sympy cython" (shoreliner is a proposed name for the env, feel free to change it)
