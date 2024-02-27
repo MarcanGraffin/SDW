@@ -13,7 +13,7 @@ Projects : contains all your current or past waterline extraction projects, with
 
 PREWORK : 
 1 - Create a conda environment with basic packages : 
-"conda create -c conda-forge -n shoreliner spyder numpy scipy pandas matplotlib simpy cpython jupyter gdal" (shoreliner is the proposed name for the new environment, and the following names are packages names, feel free to change shoreliner into any other name).
+"conda create -c conda-forge -n shoreliner spyder numpy scipy pandas matplotlib jupyter gdal" (shoreliner is the proposed name for the new environment, and the following names are packages names, feel free to change shoreliner into any other name).
 (shoreliner is a proposed name for the env, feel free to change it)
 2 - Activate the environment (eg, conda activate shoreliner)
 3 - Download all the packages : "pip install -r PATH/requirements.txt"
