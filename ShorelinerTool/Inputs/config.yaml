@@ -39,7 +39,7 @@ Missions:
 CRS : 'EPSG:3857'
 
 #Clouds
-MaxCloudCover : 10
+MaxCloudCover : 0
 CloudMasks : False
 
 # WATERLINE INDEX band combination used : SCoWI, NDWI, AWEI, MNDWI, etc...
