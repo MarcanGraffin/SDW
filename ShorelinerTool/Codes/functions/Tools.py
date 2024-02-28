@@ -7,6 +7,7 @@ from scipy.ndimage import median_filter
 from shapely import geometry
 from osgeo import osr
 import pandas as pd
+import stats
 
 def dates(dates):
     start = dates[0]
@@ -293,3 +294,87 @@ def runmedian(X,n):
                 X[i] = np.nan
                 continue
     return X
+
+#%% POST PROCESS
+
+def IQR(X, val1 = 0.25, val2 = 0.75, ratio=1.5):
+    
+    """
+    X = IQR(X)
+    Clean a timeseries by removing data deviating too much
+    from the distribution
+    """
+    
+    Q1 = np.quantile(X,val1)
+    Q3 = np.quantile(X,val2)
+    IQR = Q3-Q1
+    valmax = Q3 + ratio*IQR
+    valmin = Q1 - ratio*IQR
+    
+    idx=[]
+    for i in range(len(X)):
+        if X[i]>valmax or X[i]<valmin:
+            idx.append(i)
+    
+    return np.delete(X,idx)
+
+def findNearestTimes(data_in,dates_in,dates_out):
+    
+    """
+    new_data = findNearestTimes(old_data,old_dates,new_dates)
+    Returns the data
+    """
+    data_out=[]
+    tmp_in=np.array([dates_in[i].timestamp() for i in range(len(dates_in))])
+    tmp_out=np.array([dates_out[i].timestamp() for i in range(len(dates_out))])
+    
+    for i in tmp_out:
+        indx=abs(tmp_in-i).tolist().index(min(abs(tmp_in-i)))
+        data_out.append(data_in[indx])
+    return data_out
+
+def getStats(X,Y):
+    
+    """
+    STATS = getStats(X,Y)
+    returns the common validations stats when comparing 2 lists of the same length
+    """
+    
+    out = dict()
+    R = out['R'] = np.corrcoef(X,Y)[0][1]
+    R2 = out['R2'] = R**2
+    MSE = np.mean((X - Y) ** 2)
+    RMSE = out['RMSE'] = np.sqrt(MSE)
+    bias = out['bias'] = np.mean(X - Y)
+    std = out['STD'] = (MSE - bias**2)**.5
+    return out
+
+def slopeFromProfile(X,Z,zref=0,window=0.5):
+    
+    """
+    slope = slopeFromProfile(X,Z)
+    returns the slope around the elevation Z=zref
+    """
+    
+    idx = np.logical_and(Z>zref-window,Z<zref+window)
+    x=X[idx]
+    z=Z[idx]
+    slope = stats.linregress(x,z)[0]
+    return -slope
+
+def getCrossPos(X,Z,z):
+    
+    """
+    x = getCrossPos(X,Z,z)
+    returns the cross-shore (x) position of the intersection between
+    the elevation z and the profile(X,Z)
+    """
+    
+    X = np.array(X)
+    Z = np.array(Z)
+    tmpZ = abs(Z-z)
+    idx = tmpZ.tolist().index(min(tmpZ))
+    z1 = abs(Z[idx-1]-z)
+    z2 = abs(Z[idx+1]-z)
+    dX = X[idx+1]-X[idx-1]
+    return(X[idx-1]+z1/(z1+z2)*dX)
