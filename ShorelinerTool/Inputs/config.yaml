@@ -70,7 +70,7 @@ TidePrediction : False
 PathTideData : C:\Users\Marca\Desktop\THESE\data\validation\all_sites\TORREYPINES\TORREYPINES_tides.csv
 TideCorrection : True
 SlopeCalculation : True
-
+userDefinedSlope : 0
 MSLOffset : 0 #If dealing with in-situ data, Offset between the datum used for the beach elevation profiles and MSL
 
 
