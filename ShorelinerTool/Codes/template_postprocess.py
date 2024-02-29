@@ -71,6 +71,8 @@ if inputs['TideCorrection']:
                 for j in range(len(Xsitu)):
                     slopesitu.append(Tools.slopeFromProfile(Xsitu, Zsitu,zref=inputs['MSLOffset']))
                 finalSlope = np.nanmean(slopesitu)
+            elif inputs['userDefinedSlope']!=0:
+                finalSlope = inputs['userDefinedSlope']
             else:
                 print('Need slope data for water level correction')
                 break
