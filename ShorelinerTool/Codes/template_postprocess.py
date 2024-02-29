@@ -13,7 +13,7 @@ file_inputs = 'config.yaml'
 inputs = yaml.load(open(os.path.join('./',file_inputs),'rb'),Loader = SafeLoader)
 tag_idx = inputs['WaterlineIndex']
 
-zref = 0
+Zref = 0
 
 
 transect = dict()
@@ -69,7 +69,7 @@ if inputs['TideCorrection']:
                 Zsitu = transect[i]['situ']['elevation']
                 slopesitu=[]
                 for j in range(len(Xsitu)):
-                    slopesitu.append(Tools.slopeFromProfile(Xsitu, Zsitu,zref=inputs['MSLOffset']))
+                    slopesitu.append(Tools.slopeFromProfile(Xsitu, Zsitu,zref=Zref+inputs['MSLOffset']))
                 finalSlope = np.nanmean(slopesitu)
             elif inputs['userDefinedSlope']!=0:
                 finalSlope = inputs['userDefinedSlope']
