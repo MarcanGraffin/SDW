@@ -1,4 +1,4 @@
-Shoreliner : Satellite-derived waterline extractor by Bergsma et al., 2024
+Shoreliner : Satellite-derived waterline extractor by Bergsma and colleagues (in progress)
 
 Inputs : contains the config file, open and edit it whenever you want to extract waterlines on a new site or using a new method.*
 ### launcher.py needs files in pickle format, with a specific format (see example) to launch.
