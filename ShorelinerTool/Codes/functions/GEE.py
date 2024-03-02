@@ -105,7 +105,7 @@ def normalizeBandNamesL7(image):
       'crs':'EPSG:3857',
       'scale': 15}).float().copyProperties(image,['SCENE_CENTER_TIME'])
 
-def normalizeBandNameL5(image):
+def normalizeBandNamesL5(image):
     newImage = image.select(['B1','B2','B3','B4','B5','B7'],['blue','green','red','nir','swir1','swir2'])
     return newImage.set({'satellite':'L5', 'date':image.date()}).setDefaultProjection('EPSG:3857').reproject(
         **{
