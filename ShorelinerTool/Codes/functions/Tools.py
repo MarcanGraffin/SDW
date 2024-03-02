@@ -331,7 +331,8 @@ def findNearestTimes(data_in,dates_in,dates_out):
     tmp_out=np.array([dates_out[i].timestamp() for i in range(len(dates_out))])
     
     for i in tmp_out:
-        indx=abs(tmp_in-i).tolist().index(min(abs(tmp_in-i)))
+        tmpdiff = abs(tmp_in-i)
+        indx= np.argmin(tmpdiff)
         data_out.append(data_in[indx])
     return data_out
 
