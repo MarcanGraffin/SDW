@@ -7,7 +7,7 @@ from scipy.ndimage import median_filter
 from shapely import geometry
 from osgeo import osr
 import pandas as pd
-import stats
+from scipy.stats import linregress
 from astropy import timeseries
 from scipy import signal, integrate, interpolate
 
@@ -362,7 +362,7 @@ def slopeFromProfile(X,Z,zref=0,window=0.5):
     idx = np.logical_and(Z>zref-window,Z<zref+window)
     x=X[idx]
     z=Z[idx]
-    slope = stats.linregress(x,z)[0]
+    slope = linregress(x,z)[0]
     return -slope
 
 def getCrossPos(X,Z,z):
