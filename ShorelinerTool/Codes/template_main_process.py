@@ -22,14 +22,17 @@ for key in transects:
 
 sat = []
 dates = []
-for i in os.listdir(path_index):
+list_img = os.listdir(path_index).sort()
+for i in list_img:
         print(i)
         sat.append(i[-6:-4])
         year = int(i[:4])
         month = int(i[4:6])
         day = int(i[6:8])
+        hour = int(i[9:11])
+        minute = int(i[11:13])
         
-        date = datetime.datetime(year,month,day)
+        date = datetime.datetime(year,month,day,hour,minute)
         dates.append(date)
         
         path_tmp_index = os.path.join(path_index,i)
