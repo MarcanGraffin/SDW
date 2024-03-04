@@ -69,7 +69,11 @@ if inputs['TideCorrection']:
                 Zsitu = transect[i]['situ']['elevation']
                 slopesitu=[]
                 for j in range(len(Xsitu)):
-                    slopesitu.append(Tools.slopeFromProfile(Xsitu, Zsitu,zref=Zref+inputs['MSLOffset']))
+                    try:
+                        slopesitu.append(Tools.slopeFromProfile(Xsitu, Zsitu,zref=Zref+inputs['MSLOffset']))
+                    except:
+                        slopesitu.append(slopesitu[-1])
+                        continue
                 finalSlope = np.nanmean(slopesitu)
             elif inputs['userDefinedSlope']!=0:
                 finalSlope = inputs['userDefinedSlope']
