@@ -375,8 +375,7 @@ def getCrossPos(X,Z,z):
     
     X = np.array(X)
     Z = np.array(Z)
-    tmpZ = abs(Z-z)
-    idx = tmpZ.tolist().index(min(tmpZ))
+    idx = np.argmin(abs(Z-z))
     z1 = abs(Z[idx-1]-z)
     z2 = abs(Z[idx+1]-z)
     dX = X[idx+1]-X[idx-1]
