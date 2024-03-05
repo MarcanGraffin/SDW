@@ -50,13 +50,13 @@ if inputs['TideCorrection']:
             c+=1
             print(i + '   ' + str(int(c/len(transect))))
             try:
-                X = transect[i]['satellite']['SDW_'+tag_idx]
-                t = transect[i]['satellite']['dates']
+                X = transect[i]['satellite']['SDW_'+tag_idx].copy()
+                t = transect[i]['satellite']['dates'].copy()
             except:
                 continue
+            idxtide = np.logical_and(tidedates>t[0],tidedates<t[-1])
+            wl = np.array(Tools.findNearestTimes(tidevalues[idxtide], tidedates[idxtide], t))
             if inputs['SlopeCalculation']:
-                idxtide = np.logical_and(tidedates>t[0],tidedates<t[-1])
-                wl = np.array(Tools.findNearestTimes(tidevalues[idxtide], tidedates[idxtide], t))
                 slopes = Tools.rangeSlopes(0.0, 0.2)
                 Xall = Tools.wlCorrect(X,wl,slopes)
                 freqMax = Tools.wlPeak(t,wl)
