@@ -63,8 +63,8 @@ transects = Tools.computeIntersection(waterline,transects,sat,inputs)
 
 for i in transects:
     transects[i]['satellite'] = Tools.removeNaN(transects[i]['satellite'],inputs)
-if ploting:
-    for i in transects:
-        Tools.quickCheck(transects[i])
-        plt.title(i+'_noCorrections')
+#if ploting:
+#    for i in transects:
+#        Tools.quickCheck(transects[i])
+#        plt.title(i+'_noCorrections')
 pickle.dump(transects,open('transects.p','wb'))
