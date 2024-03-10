@@ -10,6 +10,8 @@ import pandas as pd
 from scipy.stats import linregress
 from astropy import timeseries
 from scipy import signal, integrate, interpolate
+from scipy.signal import find_peaks
+import matplotlib.pyplot as plt
 
 def dates(dates):
     start = dates[0]
@@ -90,6 +92,53 @@ def norm(band):
     band_min, band_max = band.min(), band.max()
     return ((band - band_min)/(band_max - band_min))
 
+def refinedOtsu(img,ax=[],val=256,ploting=False):
+    img_val = img[np.logical_not(np.isinf(img))]
+    hist=np.histogram(img_val,val,density=True)
+    pdf=runmedian(hist[0],10)
+    bins=hist[1]
+    bins = np.array([bins[i]+(bins[i+1]-bins[i])/2 for i in range(len(bins)-1)])
+    t_otsu=0
+    try:
+        t_otsu = threshold_otsu(img_val,val)
+    except:
+        print('fail_normal')
+    t_otsu_pdf = pdf[bins>=t_otsu][0]
+    peaks, prop = find_peaks(pdf, height=(t_otsu_pdf, None))
+    maxs_histo = bins[peaks]
+
+    res_max_left = maxs_histo[maxs_histo < t_otsu]
+    res_max_right = maxs_histo[maxs_histo >= t_otsu]
+
+    if res_max_left.size==0:
+        maxl = t_otsu 
+    else:
+        maxl = res_max_left[-1]
+
+    if res_max_right.size==0:
+        maxr = t_otsu
+    else:
+        maxr = res_max_right[0]
+
+    # select the part of the histogram between 2 peaks around the threshold
+    pdf_selected = pdf[(bins>maxl)&(bins<maxr)]
+    bins_selected = bins[(bins>maxl)&(bins<maxr)]
+
+    if bins_selected.size==0:
+        t_opti = t_otsu
+    else:
+        min_pdf = np.argmin(pdf_selected)
+        t_opti = bins_selected[min_pdf]
+    if ploting :
+        ax.plot(bins,pdf)
+        maxy = ax.get_ylim()[1]
+        ax.plot([t_otsu,t_otsu],[0,maxy],'k',linewidth=2)
+        ax.plot([t_opti,t_opti],[0,maxy],'r',linewidth=2)
+        ax.grid()
+        ax.set_xlabel('Index Value')
+        ax.set_ylabel('Frequency')
+        ax.set_ylim([0,maxy])
+    return t_otsu,t_opti,hist
 
 def otsu(img,ax=[],val=256,ploting=False):
     img_val = img[np.logical_not(np.isinf(img))]
@@ -112,7 +161,7 @@ def otsu(img,ax=[],val=256,ploting=False):
         ax.set_ylim([0,maxy])
     return t_otsu,hist
 
-def getWaterline(img,threshold,georef,i='    ',ax=[],MIN_LENGTH_SL=0,ploting=False):
+def getWaterline(img,threshold,georef,transects,i='    ',ax=[],MIN_LENGTH_SL=0,ploting=False):
     contours=find_contours(img,threshold)
     
     contours_out = [] #non_projected contours
@@ -131,7 +180,21 @@ def getWaterline(img,threshold,georef,i='    ',ax=[],MIN_LENGTH_SL=0,ploting=Fal
         for l, arr in enumerate(contours): 
             tmp = arr[:,[1,0]]
             points_converted.append(tform(tmp))
-    
+    if ploting:
+        plt.figure()
+        L,l =  img.shape[0],img.shape[1]
+        x = np.arange(georef[0],georef[0]+(L+1)*georef[1],georef[1])
+        y = np.arange(georef[3],georef[3]+(l+1)*georef[5],georef[5])
+        X,Y = np.meshgrid(x,y)
+        quantiles=np.quantile(img.flatten(),[0.05,0.95])
+        plt.pcolormesh(X,Y,img,cmap='Greys_r',vmin=quantiles[0],vmax=quantiles[1])
+        for j in transects:
+            lon = transects[j]['transect_proj'][:,0]
+            lat = transects[j]['transect_proj'][:,1]
+            plt.plot(lon,lat,'r')
+        for j in points_converted:
+            plt.plot(j[:,0],j[:,1],'.b')
+        plt.title(i)
     # if single np.array
     elif type(contours) is np.ndarray:
         tmp = contours[:,[1,0]]
@@ -297,28 +360,99 @@ def runmedian(X,n):
                 continue
     return X
 
-#%% POST PROCESS
+#%% QUICK CHECKS
 
-def IQR(X, val1 = 0.25, val2 = 0.75, ratio=1.5):
+def quickCheck(profile,wl=1.,var = 'SDW_', index='SCoWI', ploting = True):
     
     """
-    X = IQR(X)
-    Clean a timeseries by removing data deviating too much
-    from the distribution
+    use it as quickCheck(transects[PROFILEYOUWANNASEE] 
+                         for visual comparison situ/sat
     """
     
+    Xsat = profile['satellite'][var+index]
+    tsat = profile['satellite']['dates']
+    tsitu = []
+    z = profile['situ']['elevation']
+    x = profile['situ']['chainage']
+    Xsitu=[]
+    for i in range(len(x)):
+        try:
+            Xsitu.append(getCrossPos(x[i],z[i],wl))
+            tsitu.append(profile['situ']['dates'][i])
+        except:
+            continue
+    nXsat = findNearestTimes(Xsat, tsat, tsitu)
+    if ploting:
+        fig,ax = plt.subplot_mosaic("AB")
+        ax['A'].plot(tsat,Xsat,'.k',label='satellite')
+        ax['A'].plot(tsitu,Xsitu,'.r',label='situ')
+        ax['A'].set_xlabel('Dates')
+        ax['A'].set_ylabel('Cross-shore position (m)')
+        ax['A'].legend()
+        ax['B'].plot(nXsat,Xsitu)
+        ax['B'].set_xlabel('Satellite (m)')
+        ax['B'].set_ylabel('Situ (m)')
+    out = getStats(nXsat,Xsitu)
+    return(out)
+
+
+#%% POST PROCESS
+def removeNaN(TR,inputs,refmin = 0):
+    X = TR['SDW_'+inputs['WaterlineIndex']].copy()
+    nans = np.isnan(X)
+    belowzero = X<refmin #means can't have a waterline more landward than the transect origin
+    cond = np.logical_or(nans,belowzero)
+    idx_nan = np.arange(len(X))[cond]
+    for i in TR:
+        TR[i] = np.delete(TR[i],idx_nan)
+    return(TR)
+
+
+def Mode(TR,inputs,n=0.65,valid=True):
+    
+    X = TR['SDW_'+inputs['WaterlineIndex']].copy()
+    if valid:
+        tmpX = X - np.nanmax([0,np.nanmedian(X)])
+    else:
+        tmpX = X - np.nanmedian(X)
+    
+    threshold = abs(threshold_otsu(tmpX))
+    # print(threshold)
+    # print(n*np.std(tmpX))
+    idx_otsu = []
+    if threshold > n*np.std(tmpX):
+        for i in range(len(tmpX)):
+            if tmpX[i]>threshold or tmpX[i]<-threshold: #we remove data both sides, but most certainly outliers will be in the tmpX[i]<-threshold  part.
+                idx_otsu.append(i)
+    for i in TR:
+        TR[i] = np.delete(TR[i],idx_otsu)
+    return(TR)
+
+
+
+def IQR(TR,inputs, val1 = 0.25, val2 = 0.75, ratio=1.5):
+    
+    """
+    data[PROFILE]['satellite'] = IQR(data[PROFILE]['satellite'])
+    Clean a SDW timeseries by removing data deviating too much
+    from the distribution, clean also the corresponding dates and others...
+    """
+    X = TR['SDW_'+inputs['WaterlineIndex']].copy()
     Q1 = np.quantile(X,val1)
     Q3 = np.quantile(X,val2)
     IQR = Q3-Q1
     valmax = Q3 + ratio*IQR
     valmin = Q1 - ratio*IQR
     
-    idx=[]
+    idx_iqr=[]
     for i in range(len(X)):
         if X[i]>valmax or X[i]<valmin:
-            idx.append(i)
+            idx_iqr.append(i)
+            
+    for i in TR:
+        TR[i] = np.delete(TR[i],idx_iqr)
     
-    return idx
+    return TR
 
 def findNearestTimes(data_in,dates_in,dates_out):
     
@@ -467,3 +601,4 @@ def integratePowerSpectrum(dates,Xall,freqMax):
         ci = [beach_slopes[np.argmin(E)],beach_slopes[np.argmin(E)]]
     
     return beach_slopes[np.argmin(E)], ci
+
