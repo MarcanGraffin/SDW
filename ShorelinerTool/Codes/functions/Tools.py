@@ -382,17 +382,30 @@ def quickCheck(profile,wl=1.,var = 'SDW_', index='SCoWI', ploting = True):
         except:
             continue
     nXsat = findNearestTimes(Xsat, tsat, tsitu)
+    out = getStats(nXsat,Xsitu)
+    maxitmp = max([max(nXsat),max(Xsitu)])
+    minitmp = min([min(nXsat),min(Xsitu)])
+    mini = minitmp - 0.05*(maxitmp-minitmp)
+    maxi = maxitmp + 0.05*(maxitmp-minitmp)
     if ploting:
-        fig,ax = plt.subplot_mosaic("AB")
+        fig,ax = plt.subplot_mosaic("AB",figsize=((13,6)))
         ax['A'].plot(tsat,Xsat,'.k',label='satellite')
         ax['A'].plot(tsitu,Xsitu,'.r',label='situ')
         ax['A'].set_xlabel('Dates')
         ax['A'].set_ylabel('Cross-shore position (m)')
         ax['A'].legend()
-        ax['B'].plot(nXsat,Xsitu)
+        ax['B'].plot(nXsat,Xsitu,'.k')
         ax['B'].set_xlabel('Satellite (m)')
         ax['B'].set_ylabel('Situ (m)')
-    out = getStats(nXsat,Xsitu)
+        ax['B'].set_xlim([mini,maxi])
+        ax['B'].set_ylim([mini,maxi])
+        
+        tRMSE = 'RMSE = '+str(round(out['RMSE'],2))+' m'
+        tR2 = 'R² = '+str(round(out['R2'],2))
+        tbias = 'bias = '+str(round(out['bias'],2))+' m'
+        tstd = r'$\sigma$ = '+str(round(out['STD'],2))+' m'
+        allt = tR2+'\n'+tRMSE+'\n'+tbias+'\n'+tstd
+        plt.text(minitmp,maxitmp - 0.15*(maxitmp-minitmp),allt)
     return(out)
 
 
@@ -478,6 +491,7 @@ def getStats(X,Y):
     """
     X = np.array(X)
     Y = np.array(Y)
+    
     out = dict()
     R = out['R'] = np.corrcoef(X,Y)[0][1]
     R2 = out['R2'] = R**2
