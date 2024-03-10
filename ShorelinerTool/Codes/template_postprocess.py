@@ -8,15 +8,17 @@ import os
 import yaml
 from yaml.loader import SafeLoader
 import pandas as pd
+import matplotlib.pyplot as plt
+
 
 file_inputs = 'config.yaml'
 inputs = yaml.load(open(os.path.join('./',file_inputs),'rb'),Loader = SafeLoader)
 tag_idx = inputs['WaterlineIndex']
 
-Zref = 0
+zref = 1.585
+ploting = True
 
-
-transect = dict()
+transects = dict()
 
 for i in os.listdir():
     if i[:5]=='poly_':
@@ -24,16 +26,20 @@ for i in os.listdir():
         tmptransect = pickle.load(open(os.path.join(pathtmp),'rb'))
         for j in tmptransect:
             if 'satellite' in tmptransect[j]:
-                transect[j] = tmptransect[j]
+                transects[j] = tmptransect[j]
 
 
 if inputs['IQR']:
-    for i in transect:
+    for i in transects:
         try:
-            tmpX = transect[i]['satellite']['SDW_'+tag_idx].copy()
-            IQRidx = Tools.IQR(tmpX)
-            for j in transect[i]['satellite']:
-                transect[i]['satellite'][j] = np.delete(transect[i]['satellite'][j],IQRidx)
+            transects[i]['satellite'] = Tools.IQR(transects[i]['satellite'],inputs)
+        except:
+            continue
+
+if inputs['modes']:
+    for i in transects:
+        try:
+            transects[i]['satellite'] = Tools.Mode(transects[i]['satellite'],inputs)
         except:
             continue
 
@@ -46,12 +52,12 @@ if inputs['TideCorrection']:
                         '%Y-%m-%d %H:%M:%S') for i in range(len(tidedata))])
         tidevalues = tidedata.tides.values
         c=-1
-        for i in transect:
+        for i in transects:
             c+=1
-            print(i + '   ' + str(int(c/len(transect))))
+            print(i + '   ' + str(int(c/len(transects))))
             try:
-                X = transect[i]['satellite']['SDW_'+tag_idx].copy()
-                t = transect[i]['satellite']['dates'].copy()
+                X = transects[i]['satellite']['SDW_'+tag_idx].copy()
+                t = transects[i]['satellite']['dates'].copy()
             except:
                 continue
             idxtide = np.logical_and(tidedates>t[0],tidedates<t[-1])
@@ -61,16 +67,16 @@ if inputs['TideCorrection']:
                 Xall = Tools.wlCorrect(X,wl,slopes)
                 freqMax = Tools.wlPeak(t,wl)
                 finalSlope,uncSlope = Tools.integratePowerSpectrum(t,Xall,freqMax)
-                transect[i]['post'] = dict()
-                transect[i]['post']['slope'+tag_idx]=finalSlope
-                transect[i]['post']['uncertaintySlope'+tag_idx]=uncSlope
-            elif 'situ' in transect[i]:
-                Xsitu = transect[i]['situ']['chainage']
-                Zsitu = transect[i]['situ']['elevation']
+                transects[i]['post'] = dict()
+                transects[i]['post']['slope'+tag_idx]=finalSlope
+                transects[i]['post']['uncertaintySlope'+tag_idx]=uncSlope
+            elif 'situ' in transects[i]:
+                Xsitu = transects[i]['situ']['chainage']
+                Zsitu = transects[i]['situ']['elevation']
                 slopesitu=[]
                 for j in range(len(Xsitu)):
                     try:
-                        slopesitu.append(Tools.slopeFromProfile(Xsitu, Zsitu,zref=Zref+inputs['MSLOffset']))
+                        slopesitu.append(Tools.slopeFromProfile(Xsitu, Zsitu,zref=zref+inputs['MSLOffset']))
                     except:
                         slopesitu.append(slopesitu[-1])
                         continue
@@ -80,11 +86,14 @@ if inputs['TideCorrection']:
             else:
                 print('Need slope data for water level correction')
                 break
-            correction = (zref-wl)/finalSlope
+            correction = -(zref-wl)/finalSlope
             X += correction
-            transect[i]['satellite']['SDW_'+tag_idx+'_tCorr'] = X
-
-pickle.dump(transect,open('transects_post.p','wb'))
+            transects[i]['satellite']['tideCorrected_'+tag_idx] = X
+if ploting:
+    for i in transects:
+        transects[i]['stats'] = Tools.quickCheck(transects[i],var='tideCorrected_')
+        plt.title(i+'_corrected')
+pickle.dump(transects,open('transects_post.p','wb'))
 
 
 
