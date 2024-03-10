@@ -476,7 +476,8 @@ def getStats(X,Y):
     STATS = getStats(X,Y)
     returns the common validations stats when comparing 2 lists of the same length
     """
-    
+    X = np.array(X)
+    Y = np.array(Y)
     out = dict()
     R = out['R'] = np.corrcoef(X,Y)[0][1]
     R2 = out['R2'] = R**2
