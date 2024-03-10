@@ -86,7 +86,7 @@ if inputs['TideCorrection']:
             else:
                 print('Need slope data for water level correction')
                 break
-            correction = -(zref-wl)/finalSlope
+            correction = (wl-zref)/finalSlope
             X += correction
             transects[i]['satellite']['tideCorrected_'+tag_idx] = X
 if ploting:
