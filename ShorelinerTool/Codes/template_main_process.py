@@ -8,12 +8,13 @@ import datetime
 import sys
 sys.path.insert(0, r"../../../Codes")
 from functions import Tools
+import matplotlib.pyplot as plt
 
 file_inputs = 'config.yaml'
 inputs = yaml.load(open(os.path.join('../',file_inputs),'rb'),Loader = SafeLoader)
 
 path_index = os.path.join('./',inputs['WaterlineIndex'])
-
+ploting=True
 waterline = []
 #%%Process
 transects = pickle.load(open('transects.p','rb'))
@@ -22,8 +23,15 @@ for key in transects:
 
 sat = []
 dates = []
-list_img = os.listdir(path_index).sort()
+list_img = os.listdir(path_index)
+list_img.sort()
+c=-1
 for i in list_img:
+        c+=1
+        if c%10==0 and ploting:
+            plting=True
+        else:
+            plting=False
         print(i)
         sat.append(i[-6:-4])
         year = int(i[:4])
@@ -37,11 +45,14 @@ for i in list_img:
         
         path_tmp_index = os.path.join(path_index,i)
         img = gdal.Open(path_tmp_index)
-        SCoWI = img.GetRasterBand(1).ReadAsArray()
+        try:
+            SCoWI = img.GetRasterBand(1).ReadAsArray()
+        except:
+            continue
         gt = img.GetGeoTransform()
-        t_otsu,hist = Tools.otsu(SCoWI)
+        t_otsunaze,t_otsu,hist = Tools.refinedOtsu(SCoWI)
         
-        wl_tmp, wl_noproj_tmp = Tools.getWaterline(SCoWI,t_otsu,gt)
+        wl_tmp, wl_noproj_tmp = Tools.getWaterline(SCoWI,t_otsu,gt,transects,i=i,ploting=plting)
         waterline.append(wl_tmp)
         
 for key in transects:
@@ -49,4 +60,11 @@ for key in transects:
     transects[key]['satellite']['sat'] = np.array(sat)
 
 transects = Tools.computeIntersection(waterline,transects,sat,inputs)
+
+for i in transects:
+    transects[i]['satellite'] = Tools.removeNaN(transects[i]['satellite'],inputs)
+if ploting:
+    for i in transects:
+        Tools.quickCheck(transects[i])
+        plt.title(i+'_noCorrections')
 pickle.dump(transects,open('transects.p','wb'))
