@@ -57,6 +57,7 @@ VegetationIndex : NDVI
 # preprocessing : Pansharpening, CloudMasking_Landsat, CloudMasking_Sentinel2
 Preprocessing:
     - Pansharpening
+    - Bicubic
 
 # contouring method used : OtsuMS, CannyFilter
 Contouring : OtsuMS
