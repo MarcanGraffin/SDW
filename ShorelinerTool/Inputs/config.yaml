@@ -22,7 +22,7 @@ Vegetation : False
 RGB : True
 
 #ROIs
-SizeROI : 0.01   #approximate ROIs size (in degrees 1° ~ 100km)
+SizeROI : 0.05   #approximate ROIs size (in degrees 1° ~ 100km)
 SaveShpROI : True
 
 # starting and ending dates (YYYY/MM/DD)
