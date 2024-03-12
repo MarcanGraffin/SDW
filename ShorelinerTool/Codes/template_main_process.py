@@ -33,7 +33,7 @@ for i in list_img:
         else:
             plting=False
         print(i)
-        sat.append(i[-6:-4])
+        
         year = int(i[:4])
         month = int(i[4:6])
         day = int(i[6:8])
@@ -41,7 +41,7 @@ for i in list_img:
         minute = int(i[11:13])
         
         date = datetime.datetime(year,month,day,hour,minute)
-        dates.append(date)
+        
         
         path_tmp_index = os.path.join(path_index,i)
         img = gdal.Open(path_tmp_index)
@@ -49,11 +49,21 @@ for i in list_img:
             SCoWI = img.GetRasterBand(1).ReadAsArray()
         except:
             continue
-        gt = img.GetGeoTransform()
-        t_otsunaze,t_otsu,hist = Tools.refinedOtsu(SCoWI)
-        
-        wl_tmp, wl_noproj_tmp = Tools.getWaterline(SCoWI,t_otsu,gt,transects,i=i,ploting=plting)
-        waterline.append(wl_tmp)
+        idx_nan=0
+        for l in range(len(SCoWI)):
+            for h in range(len(SCoWI[l])):
+                if SCoWI[l,h]==0.0 or np.isnan(SCoWI[l,h]):
+                    SCoWI[l,h] = np.nan
+                    idx_nan+=1
+        rate = idx_nan/len(SCoWI.flatten())
+        if rate>0.5:
+            gt = img.GetGeoTransform()
+            t_otsunaze,t_otsu,hist = Tools.refinedOtsu(SCoWI)
+            
+            wl_tmp, wl_noproj_tmp = Tools.getWaterline(SCoWI,t_otsu,gt,transects,date,inputs,i=i,ploting=plting)
+            waterline.append(wl_tmp)
+            dates.append(date)
+            sat.append(i[-6:-4])
         
 for key in transects:
     transects[key]['satellite']['dates'] = np.array(dates)
@@ -63,8 +73,8 @@ transects = Tools.computeIntersection(waterline,transects,sat,inputs)
 
 for i in transects:
     transects[i]['satellite'] = Tools.removeNaN(transects[i]['satellite'],inputs)
-#if ploting:
-#    for i in transects:
-#        Tools.quickCheck(transects[i])
-#        plt.title(i+'_noCorrections')
+if ploting:
+    for i in transects:
+        Tools.quickCheck(transects[i],inputs)
+        plt.title(i+'_noCorrections')
 pickle.dump(transects,open('transects.p','wb'))
