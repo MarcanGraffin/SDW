@@ -93,7 +93,7 @@ def norm(band):
     return ((band - band_min)/(band_max - band_min))
 
 def refinedOtsu(img,ax=[],val=256,ploting=False):
-    img_val = img[np.logical_not(np.isinf(img))]
+    img_val = img[np.logical_not(np.isnan(img))]
     hist=np.histogram(img_val,val,density=True)
     pdf=runmedian(hist[0],10)
     bins=hist[1]
@@ -161,7 +161,7 @@ def otsu(img,ax=[],val=256,ploting=False):
         ax.set_ylim([0,maxy])
     return t_otsu,hist
 
-def getWaterline(img,threshold,georef,transects,i='    ',ax=[],MIN_LENGTH_SL=0,ploting=False):
+def getWaterline(img,threshold,georef,transects,date,inputs,i='    ',ax=[],MIN_LENGTH_SL=0,ploting=False):
     contours=find_contours(img,threshold)
     
     contours_out = [] #non_projected contours
@@ -177,28 +177,48 @@ def getWaterline(img,threshold,georef,transects,i='    ',ax=[],MIN_LENGTH_SL=0,p
     if type(contours) is list:
         points_converted = []
         # iterate over the list
-        for l, arr in enumerate(contours): 
+        for l, arr in enumerate(contours):
+            
             tmp = arr[:,[1,0]]
-            points_converted.append(tform(tmp))
+            if len(tmp)>10:
+                points_converted.append(tform(tmp))
+    # elif type(contours) is np.ndarray:
+    #     tmp = contours[:,[1,0]]
+    #     points_converted = tform(tmp)
+        
+        
+        
+        
     if ploting:
         plt.figure()
         L,l =  img.shape[0],img.shape[1]
         x = np.arange(georef[0],georef[0]+(L+1)*georef[1],georef[1])
         y = np.arange(georef[3],georef[3]+(l+1)*georef[5],georef[5])
         X,Y = np.meshgrid(x,y)
-        quantiles=np.quantile(img.flatten(),[0.05,0.95])
+        quantiles=np.nanquantile(img.flatten(),[0.05,0.95])
         plt.pcolormesh(X,Y,img,cmap='Greys_r',vmin=quantiles[0],vmax=quantiles[1])
         for j in transects:
             lon = transects[j]['transect_proj'][:,0]
             lat = transects[j]['transect_proj'][:,1]
             plt.plot(lon,lat,'r')
+            if 'situ' in transects[j]:
+                d = ((lon[0]-lon[1])**2+(lat[0]-lat[1])**2)**.5
+                tsitu = transects[j]['situ']['dates']
+                timg = np.array([date])
+                idx = findNearestTimes(range(len(tsitu)), tsitu, timg)[0]
+                if not(np.isnan(idx)):
+                    X = transects[j]['situ']['chainage'][idx]
+                    Z = np.array(transects[j]['situ']['elevation'][idx])
+                    Xsitu = getCrossPos(X,Z,inputs['MSLOffset'])
+                    posx = lon[0] + Xsitu/d*(lon[1] - lon[0]) 
+                    posy = lat[0] + Xsitu/d*(lat[1] - lat[0])
+                    plt.plot([posx],[posy],'x',color='orange',markersize=10)
         for j in points_converted:
             plt.plot(j[:,0],j[:,1],'.b')
         plt.title(i)
+        
     # if single np.array
-    elif type(contours) is np.ndarray:
-        tmp = contours[:,[1,0]]
-        points_converted = tform(tmp)
+    
     
     
     contours_coord=points_converted
@@ -273,14 +293,8 @@ def computeIntersection(shorelines, transects, sat_id, inputs):
                                    [Y0]]), (1,len(sl[idx_close])))
                 xy_rot = np.matmul(Mrot, xy_close)
                 # compute the median of the intersections along the transect
-                if i==0 :
-                    intersections[i,j] = np.nanmax(xy_rot[0,:])
-                else:
-                    if not(np.isnan(intersections[i-1,j])):
-                        idx = (xy_rot[0,:] - intersections[i-1,j]).tolist().index(min(xy_rot[0,:] - intersections[i-1,j]))
-                        intersections[i,j] = xy_rot[0,idx]
-                    else:
-                        intersections[i,j] = np.nanmax(xy_rot[0,:])
+                intersections[i,j] = np.nanmax(xy_rot[0,:])
+                        
     for j,key in enumerate(list(transects.keys())):
         transects[key]['satellite']['SDW_'+inputs['WaterlineIndex']] = intersections[:,j]
     return transects
@@ -362,26 +376,36 @@ def runmedian(X,n):
 
 #%% QUICK CHECKS
 
-def quickCheck(profile,wl=1.,var = 'SDW_', index='SCoWI', ploting = True):
+def quickCheck(profile,inputs,wl=0.,var = 'SDW_', index='SCoWI', ploting = True):
     
     """
     use it as quickCheck(transects[PROFILEYOUWANNASEE] 
                          for visual comparison situ/sat
     """
-    
+    z = wl + inputs['MSLOffset']
     Xsat = profile['satellite'][var+index]
     tsat = profile['satellite']['dates']
     tsitu = []
-    z = profile['situ']['elevation']
-    x = profile['situ']['chainage']
+    Z = profile['situ']['elevation']
+    X = profile['situ']['chainage']
     Xsitu=[]
-    for i in range(len(x)):
+    idx_error=[]
+    for i in range(len(X)):
         try:
-            Xsitu.append(getCrossPos(x[i],z[i],wl))
+            Xsitu.append(getCrossPos(X[i],Z[i],z))
             tsitu.append(profile['situ']['dates'][i])
         except:
+            idx_error.append(i)
             continue
+    for i in profile['situ']:
+        profile['situ'][i] = np.delete(np.array(profile['situ'][i],dtype='object'),idx_error)
+    profile['situ']['situ_'+var+index] = Xsitu
+    profile['situ'] = IQR(profile['situ'],inputs,'situ_'+var+index,ratio=1)
     nXsat = findNearestTimes(Xsat, tsat, tsitu)
+    idx_nan = np.arange(len(nXsat))[np.isnan(nXsat)]
+    nXsat = np.delete(nXsat,idx_nan)
+    Xsitu = np.delete(Xsitu,idx_nan)
+    tsitu = np.delete(tsitu,idx_nan)
     out = getStats(nXsat,Xsitu)
     maxitmp = max([max(nXsat),max(Xsitu)])
     minitmp = min([min(nXsat),min(Xsitu)])
@@ -443,14 +467,14 @@ def Mode(TR,inputs,n=0.65,valid=True):
 
 
 
-def IQR(TR,inputs, val1 = 0.25, val2 = 0.75, ratio=1.5):
+def IQR(TR,inputs, varname,val1 = 0.25, val2 = 0.75, ratio=1.5):
     
     """
     data[PROFILE]['satellite'] = IQR(data[PROFILE]['satellite'])
     Clean a SDW timeseries by removing data deviating too much
     from the distribution, clean also the corresponding dates and others...
     """
-    X = TR['SDW_'+inputs['WaterlineIndex']].copy()
+    X = TR[varname].copy()
     Q1 = np.quantile(X,val1)
     Q3 = np.quantile(X,val2)
     IQR = Q3-Q1
@@ -463,7 +487,11 @@ def IQR(TR,inputs, val1 = 0.25, val2 = 0.75, ratio=1.5):
             idx_iqr.append(i)
             
     for i in TR:
-        TR[i] = np.delete(TR[i],idx_iqr)
+        try:
+            TR[i] = np.delete(TR[i],idx_iqr)
+        except:
+            TR[i] = np.delete(np.array(TR[i],dtype='object'),idx_iqr)
+            continue
     
     return TR
 
@@ -479,8 +507,11 @@ def findNearestTimes(data_in,dates_in,dates_out):
     
     for i in tmp_out:
         tmpdiff = abs(tmp_in-i)
-        indx= np.argmin(tmpdiff)
-        data_out.append(data_in[indx])
+        if min(tmpdiff)/3600/24<30:
+            indx= np.argmin(tmpdiff)
+            data_out.append(data_in[indx])
+        else:
+            data_out.append(np.nan)
     return data_out
 
 def getStats(X,Y):
