@@ -56,7 +56,7 @@ for i in list_img:
                     SCoWI[l,h] = np.nan
                     idx_nan+=1
         rate = idx_nan/len(SCoWI.flatten())
-        if rate>0.5:
+        if rate<0.5:
             gt = img.GetGeoTransform()
             t_otsunaze,t_otsu,hist = Tools.refinedOtsu(SCoWI)
             
