@@ -15,7 +15,7 @@ file_inputs = 'config.yaml'
 inputs = yaml.load(open(os.path.join('./',file_inputs),'rb'),Loader = SafeLoader)
 tag_idx = inputs['WaterlineIndex']
 
-zref = 1.585
+zref = 0
 ploting = True
 
 transects = dict()
@@ -62,6 +62,10 @@ if inputs['TideCorrection']:
                 continue
             idxtide = np.logical_and(tidedates>t[0],tidedates<t[-1])
             wl = np.array(Tools.findNearestTimes(tidevalues[idxtide], tidedates[idxtide], t))
+            idx_nan = np.arange(len(wl))[np.isnan(wl)]
+            wl = np.delete(wl,idx_nan)
+            t = np.delete(t,idx_nan)
+            X = np.delete(X,idx_nan)
             if inputs['SlopeCalculation']:
                 slopes = Tools.rangeSlopes(0.0, 0.2)
                 Xall = Tools.wlCorrect(X,wl,slopes)
@@ -76,7 +80,7 @@ if inputs['TideCorrection']:
                 slopesitu=[]
                 for j in range(len(Xsitu)):
                     try:
-                        slopesitu.append(Tools.slopeFromProfile(Xsitu, Zsitu,zref=zref+inputs['MSLOffset']))
+                        slopesitu.append(Tools.slopeFromProfile(Xsitu[j], Zsitu[j],zref+inputs['MSLOffset']))
                     except:
                         slopesitu.append(slopesitu[-1])
                         continue
@@ -91,7 +95,7 @@ if inputs['TideCorrection']:
             transects[i]['satellite']['tideCorrected_'+tag_idx] = X
 if ploting:
     for i in transects:
-        transects[i]['stats'] = Tools.quickCheck(transects[i],var='tideCorrected_')
+        transects[i]['stats'] = Tools.quickCheck(transects[i],inputs,var='tideCorrected_')
         plt.title(i+'_corrected')
 pickle.dump(transects,open('transects_post.p','wb'))
 
