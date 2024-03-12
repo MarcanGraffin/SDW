@@ -5,6 +5,7 @@
 EE_ID :  strange-bird-356322
 PathProject : .\Projects
 Project : Torrey_Pines_test
+siteName : Torrey Pines #For some ploting
 
 #transects path (transects in EPSG:4326)
 PathTransect :
